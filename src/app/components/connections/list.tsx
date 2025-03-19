@@ -9,13 +9,23 @@ const connections = [
 ];
 
 export default function ConnectionsPage() {
+  const [search, setSearch] = useState("");
   const [data, setData] = useState(connections);
-
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
   return (
     <div className="p-6">
       <h1 className="text-2xl font-semibold mb-4">Connections</h1>
 
       <div className="overflow-x-auto">
+        <input
+          type="text"
+          placeholder="Search companies..."
+          value={search}
+          onChange={handleSearch}
+          className="input input-bordered w-full max-w-md mb-4"
+        />
         <table className="table table-zebra w-full">
           {/* Table Header */}
           <thead>

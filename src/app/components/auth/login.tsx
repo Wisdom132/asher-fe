@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 
 const Login = () => {
@@ -12,9 +13,9 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="card w-96 bg-white shadow-lg p-6 rounded-lg">
-        <h2 className="text-2xl font-bold text-center mb-4">Login</h2>
+    <div className="flex justify-center items-center h-screen">
+      <div className="card w-full max-w-md bg-base-100 shadow-xl p-6 text-left">
+        <h2 className="text-2xl font-bold text-left mb-4">Login</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-control">
             <label className="label">Email</label>
@@ -48,11 +49,9 @@ const Login = () => {
             <label>Remember Me</label>
           </div>
           <button className="btn btn-primary w-full mt-4">Login</button>
-          <p className="text-sm text-center mt-3">
-            <a href="#" className="text-blue-500">
+            <div className="text-sm text-center mt-3 text-blue-500 cursor-pointer hover:underline">
               Forgot Password?
-            </a>
-          </p>
+            </div>
         </form>
       </div>
     </div>

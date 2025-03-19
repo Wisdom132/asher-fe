@@ -1,15 +1,21 @@
 "use client";
 import { useState } from "react";
+import { useLogin } from "@/app/hooks/useLogin";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+   const [form, setForm] = useState({ email: "", password: "" });
   const [rememberMe, setRememberMe] = useState(false);
 
+  const {mutate, isPending} = useLogin()
+
+    const handleChange = (e: any) => {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log({ email, password, rememberMe });
+    mutate(form);
   };
 
   return (
@@ -21,10 +27,11 @@ const Login = () => {
             <label className="label">Email</label>
             <input
               type="email"
+              name="email"
               placeholder="Enter your email"
               className="input input-bordered w-full"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={form.email}
+              onChange={handleChange}
               required
             />
           </div>
@@ -32,26 +39,33 @@ const Login = () => {
             <label className="label">Password</label>
             <input
               type="password"
+              name="password"
               placeholder="Enter your password"
               className="input input-bordered w-full"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={form.password}
+              onChange={handleChange}
               required
             />
           </div>
-          <div className="form-control mt-3 flex items-center">
+          <div className="form-control mt-3 text-sm flex items-center">
             <input
               type="checkbox"
-              className="checkbox mr-2"
+              className="checkbox mr-1 scale-75"
               checked={rememberMe}
               onChange={() => setRememberMe(!rememberMe)}
             />
             <label>Remember Me</label>
           </div>
-          <button className="btn btn-primary w-full mt-4">Login</button>
-            <div className="text-sm text-center mt-3 text-blue-500 cursor-pointer hover:underline">
-              Forgot Password?
-            </div>
+          <button
+            type="submit"
+            className="btn btn-primary w-full mt-4"
+            disabled={isPending}
+          >
+            {isPending ? 'Logging in' : 'Login'}
+          </button>
+          <div className="text-sm text-center mt-3 text-blue-500 cursor-pointer hover:underline">
+            Forgot Password?
+          </div>
         </form>
       </div>
     </div>

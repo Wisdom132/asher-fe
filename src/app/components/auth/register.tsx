@@ -103,7 +103,7 @@ const RegistrationPage = () => {
               <span className="label-text mb-1">
                 {formData.userType === "Company"
                   ? "Company name"
-                  : "Investor name"}
+                  : "Fund name"}
               </span>
             </label>
             <input

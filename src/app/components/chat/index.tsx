@@ -47,7 +47,7 @@ export default function ChatRequestsPage() {
     <div className="p-6">
       <h2 className="text-xl font-semibold mb-4">Chat Requests</h2>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto rounded-box border border-base-content/5 p-2">
         <table className="table table-zebra w-full">
           {/* Table Header */}
           <thead>

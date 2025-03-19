@@ -9,7 +9,7 @@ const connections = [
   { id: 4, name: "Black rock", handle: "@Udy449", status: "Declined" },
 ];
 
-export default function ConnectionsPage() {
+export default function IntroductionRequest() {
   const [search, setSearch] = useState("");
   const [data, setData] = useState(connections);
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -17,7 +17,7 @@ export default function ConnectionsPage() {
   };
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-4">Connections</h1>
+      <h1 className="text-2xl font-semibold mb-4">Introduction Request</h1>
 
       <div className="overflow-x-auto rounded-box border border-base-content/5 p-2">
         <input

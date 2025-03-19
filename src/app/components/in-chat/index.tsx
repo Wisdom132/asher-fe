@@ -4,7 +4,10 @@ import { io } from "socket.io-client";
 const socket = io("http://localhost:3000");
 
 export default function ChatComponent() {
-  const [selectedInvestor, setSelectedInvestor] = useState();
+const [selectedInvestor, setSelectedInvestor] = useState<{
+  id: number;
+  name: string;
+} | null>(null);
     const [input, setInput] = useState("");
 
   const investors = [
@@ -56,17 +59,17 @@ export default function ChatComponent() {
       };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-[90vh]">
       {/* Sidebar */}
-      <div className="w-1/4  shadow-lg p-4 border-r">
+      <div className="w-1/4 shadow-lg p-4 border rounded border-gray-800">
         <h2 className="text-lg font-bold mb-4">Connected Investors</h2>
         <ul>
           {investors.map((investor) => (
             <li
               key={investor.id}
               className={`p-3 rounded-lg cursor-pointer ${
-                selectedInvestor.id === investor.id
-                  ? "bg-blue-500 text-white"
+                selectedInvestor?.id === investor.id
+                  ? "bg-gray-500 text-white"
                   : "hover:bg-gray-900"
               }`}
               onClick={() => setSelectedInvestor(investor)}
@@ -78,13 +81,16 @@ export default function ChatComponent() {
       </div>
 
       {/* Chat Section */}
-      <div className="flex flex-col w-3/4 h-full shadow-lg">
+      <div className="flex flex-col w-3/4 border border-gray-800 rounded shadow-lg">
         {selectedInvestor ? (
           <>
-            <div className="p-4 border-b bg-blue-500 text-white font-bold text-lg">
+            {/* Chat Header */}
+            <div className="p-4 border-b border-b-gray-800 bg-gray-500 text-white font-bold text-lg">
               Chat with {selectedInvestor.name}
             </div>
-            <div className="flex-1 p-4 overflow-y-auto space-y-4">
+
+            {/* Scrollable Messages */}
+            <div className="flex-1 p-4 overflow-y-auto space-y-4 h-0">
               {messages.map((msg, index) => (
                 <div
                   key={index}
@@ -96,7 +102,7 @@ export default function ChatComponent() {
                     className={`p-3 rounded-lg max-w-xs ${
                       msg.sender === "Company"
                         ? "bg-gray-200 text-black"
-                        : "bg-blue-500 text-white"
+                        : "bg-primary text-white"
                     }`}
                   >
                     <p className="text-sm">{msg.text}</p>
@@ -107,7 +113,9 @@ export default function ChatComponent() {
                 </div>
               ))}
             </div>
-            <div className="p-4 border-t flex items-center">
+
+            {/* Fixed Input Field */}
+            <div className="p-4 border-t border-t-gray-800 flex items-center">
               <input
                 type="text"
                 placeholder="Type a message..."

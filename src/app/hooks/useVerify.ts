@@ -1,8 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import api from "@/app/lib/axios";
 
-const verifyEmail = async (token: string) => {
-  const response = await api.post("/auth/verify-email", { token });
+const verifyEmail = async (otp: string) => {
+  const userEmail = localStorage.getItem("user-email");
+  const response = await api.post("/auth/verify-email", {
+    otp,
+    email: userEmail,
+  });
   return response.data;
 };
 
@@ -10,8 +14,7 @@ export const useVerifyEmail = () => {
   return useMutation({
     mutationFn: verifyEmail,
     onSuccess: () => {
-      alert("Email verified! You can now log in.");
-      window.location.href = "/login"; // Redirect to login after success
+      window.location.href = "/auth/login"; 
     },
     onError: (error) => {
       console.error("Email verification failed:", error);

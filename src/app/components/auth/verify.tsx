@@ -1,34 +1,16 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useVerifyEmail } from "@/app/hooks/useVerify";
 
 const VerifyEmail = () => {
   const [otp, setOtp] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
-
+  const {isPending, mutate} = useVerifyEmail()
   const handleVerify = async () => {
-    setLoading(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert("Email verified successfully");
-      router.push("/dashboard");
-    } catch (error) {
-      alert("Invalid OTP. Please try again.");
-    }
-    setLoading(false);
+   mutate(otp)
   };
 
-  const handleResendOtp = async () => {
-    setLoading(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert("New OTP sent to your email");
-    } catch (error) {
-      alert("Failed to resend OTP. Please try again.");
-    }
-    setLoading(false);
-  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -46,16 +28,16 @@ const VerifyEmail = () => {
         />
         <button
           onClick={handleVerify}
-          disabled={loading}
+          disabled={isPending}
           className={`btn btn-primary w-full mb-2 ${
-            loading ? "btn-disabled" : ""
+            isPending ? "btn-disabled" : ""
           }`}
         >
-          {loading ? "Verifying..." : "Verify"}
+          {isPending ? "Verifying..." : "Verify"}
         </button>
-        <div className="text-sm text-center mt-3 text-blue-500 cursor-pointer hover:underline">
-           {loading ? "Resending..." : "Resend OTP"}
-        </div>
+        {/* <div className="text-sm text-center mt-3 text-blue-500 cursor-pointer hover:underline">
+          {loadisPendinging ? "Resending..." : "Resend OTP"}
+        </div> */}
       </div>
     </div>
   );

@@ -148,9 +148,9 @@ const RegistrationPage = () => {
           <button
             type="submit"
             className="btn btn-primary w-full"
-            disabled={!isHandleValid}
+            disabled={!isHandleValid || isPending}
           >
-            {isPending ? 'Creating Account': 'Create Account'}
+            {isPending ? "Creating Account" : "Create Account"}
           </button>
         </form>
       </div>

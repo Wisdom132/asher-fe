@@ -1,111 +1,84 @@
 "use client";
 
+import { useConnections } from "@/app/hooks/useConnections";
+import { useChatRequests } from "@/app/hooks/useChatRequests";
+import { useSendChatRequest } from "@/app/hooks/useSendChatRequest";
+import { useRespondChatRequest } from "@/app/hooks/useRespondChatReuest";
 import { useState } from "react";
 
-type ChatRequest = {
-  id: string;
-  investorName: string;
-  companyName: string;
-  status: "Pending" | "Accepted" | "Declined";
-  userType: "Investor" | "Company";
-};
-
-const chatRequests: ChatRequest[] = [
-  {
-    id: "1",
-    investorName: "John Doe",
-    companyName: "Tech Corp",
-    status: "Pending",
-    userType: "Investor",
-  },
-  {
-    id: "2",
-    investorName: "Jane Smith",
-    companyName: "Fintech Inc.",
-    status: "Accepted",
-    userType: "Company",
-  },
-];
-
 export default function ChatRequestsPage() {
-  const [requests, setRequests] = useState(chatRequests);
+  const { data: connections, isLoading: loadingConnections } = useConnections();
+  const { data: requests, isLoading: loadingRequests } = useChatRequests();
 
-  const handleAction = (
-    id: string,
-    action: "accept" | "decline" | "cancel"
-  ) => {
-    setRequests((prev) =>
-      prev.map((req) =>
-        req.id === id
-          ? { ...req, status: action === "accept" ? "Accepted" : "Declined" }
-          : req
-      )
-    );
-  };
+  const { mutate: respondRequest } = useRespondChatRequest();
+  const { mutate: sendChatRequest, isPending: sending } = useSendChatRequest();
+
+  if (loadingConnections || loadingRequests) return <p>Loading...</p>;
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-semibold mb-4">Chat Requests</h2>
+      <h1 className="text-2xl font-bold mb-4">Connections/Requests</h1>
+      <div>
+        <h2 className="text-xl font-semibold">Connections</h2>
+        <table className="table mt-4">
+          <thead>
+            <tr>
+              <th>Investor</th>
+              <th>Company</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {connections?.map((connection: any) => (
+              <tr key={connection.id}>
+                <td>{connection.investor.name}</td>
+                <td>{connection.company.name}</td>
+               
+                <td>
+                  <button
+                    className="btn btn-primary mt-3 w-full"
+                    onClick={() => {
+                      sendChatRequest(connection.id);
+                    }}
+                  >
+                    Send Request
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <div className="overflow-x-auto rounded-box border border-base-content/5 p-2">
-        <table className="table table-zebra w-full">
-          {/* Table Header */}
+
+      {/* Section for Companies to Approve/Reject Requests */}
+      <div>
+        <h2 className="text-xl font-semibold">Chat Requests status</h2>
+        <table className="table mt-4">
           <thead>
             <tr>
               <th>Investor</th>
               <th>Company</th>
               <th>Status</th>
-              <th>Actions</th>
             </tr>
           </thead>
-
-          {/* Table Body */}
           <tbody>
-            {requests.map((request) => (
+            {requests?.map((request: any) => (
               <tr key={request.id}>
-                <td>{request.investorName}</td>
-                <td>{request.companyName}</td>
+                <td>{request.investor.name}</td>
+                <td>{request.company.name}</td>
                 <td>
                   <span
                     className={`badge ${
-                      request.status === "Accepted"
+                      request.status === "PENDING"
+                        ? "badge-warning"
+                        : request.status === "ACCEPTED"
                         ? "badge-success"
-                        : request.status === "Declined"
-                        ? "badge-error"
-                        : "badge-warning"
+                        : "badge-error"
                     }`}
                   >
                     {request.status}
                   </span>
-                </td>
-                <td>
-                  {request.status === "Pending" &&
-                    request.userType === "Company" && (
-                      <>
-                        <button
-                          className="btn btn-success btn-sm mr-2"
-                          onClick={() => handleAction(request.id, "accept")}
-                        >
-                          Accept
-                        </button>
-                        <button
-                          className="btn btn-error btn-sm"
-                          onClick={() => handleAction(request.id, "decline")}
-                        >
-                          Decline
-                        </button>
-                      </>
-                    )}
-
-                  {request.status === "Pending" &&
-                    request.userType === "Investor" && (
-                      <button
-                        className="btn btn-outline btn-warning btn-sm"
-                        onClick={() => handleAction(request.id, "cancel")}
-                      >
-                        Cancel Request
-                      </button>
-                    )}
                 </td>
               </tr>
             ))}

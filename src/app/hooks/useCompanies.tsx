@@ -3,7 +3,6 @@ import api from "@/app/lib/axios";
 
 const fetchCompanies = async () => {
     const response = await api.get("/connections/companies");
-    console.log("triggered", response)
     return response.data;
 };
 

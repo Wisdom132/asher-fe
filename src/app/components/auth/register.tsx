@@ -1,14 +1,24 @@
 'use client'
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRegister } from "@/app/hooks/useRegister";
+import { useValidateTelegramHandle } from "@/app/hooks/useValidateTelegramHandle";
 
 const RegistrationPage = () => {
+  const { isPending, mutate, isSuccess } = useRegister();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     telegramHandle: "",
     userType: "Investor",
     fundOrCompany: "",
+    password: ""
   });
+
+  const { data: isHandleValid, isFetching } = useValidateTelegramHandle(
+    formData.telegramHandle
+  );
+
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -18,7 +28,9 @@ const RegistrationPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted", formData);
+    if (!isHandleValid) return;
+    localStorage.setItem('user-email', formData.email)
+    mutate(formData)
   };
 
   return (
@@ -62,8 +74,14 @@ const RegistrationPage = () => {
               required
               className="input input-bordered w-full"
             />
-            <p className="mt-1 text-xs text-green-500">
-              Handle is validated ✅
+            <p className="mt-1 text-xs">
+              {isFetching ? (
+                <span className="text-gray-500">Validating handle...</span>
+              ) : isHandleValid ? (
+                <span className="text-green-500">Handle is valid ✅</span>
+              ) : (
+                <span className="text-red-500">Invalid handle ❌</span>
+              )}
             </p>
           </div>
 
@@ -101,9 +119,7 @@ const RegistrationPage = () => {
           <div className="form-control">
             <label className="label">
               <span className="label-text mb-1">
-                {formData.userType === "Company"
-                  ? "Company name"
-                  : "Fund name"}
+                {formData.userType === "Company" ? "Company name" : "Fund name"}
               </span>
             </label>
             <input
@@ -115,8 +131,26 @@ const RegistrationPage = () => {
               className="input input-bordered w-full"
             />
           </div>
-          <button type="submit" className="btn btn-primary w-full">
-            Register
+
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text mb-1">Password</span>
+            </label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="input input-bordered w-full"
+            />
+          </div>
+          <button
+            type="submit"
+            className="btn btn-primary w-full"
+            disabled={!isHandleValid}
+          >
+            {isPending ? 'Creating Account': 'Create Account'}
           </button>
         </form>
       </div>

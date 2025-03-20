@@ -1,8 +1,9 @@
 "use client";
 
 import { useCompanies } from "@/app/hooks/useCompanies";
-import { useCallback, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useDebounce } from "use-debounce";
+import { useConnectCompany } from "@/app/hooks/useConnectCompany";
 
 
 interface Company {
@@ -10,12 +11,14 @@ interface Company {
   fundOrCompany: string;
   name: string;
   isConnected: boolean;
+  isPending: boolean
 }
 
 export default function ConnectionsPage() {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebounce(search, 300);
   const { data: companies, isLoading, error } = useCompanies();
+  const { mutate: connectCompany, isPending: connecting } = useConnectCompany();
 
 
 const filteredCompanies = useMemo(() => {
@@ -24,9 +27,6 @@ const filteredCompanies = useMemo(() => {
   );
 }, [companies, debouncedSearch]);
 
-  const sendConnectionRequest = (companyId: string) => {
-    console.log(`Sending connection request to company ID: ${companyId}`);
-  };
 
   if (isLoading) return <p>Loading companies...</p>;
   if (error) return <p className="text-red-500">Failed to load companies.</p>;
@@ -50,20 +50,27 @@ const filteredCompanies = useMemo(() => {
             <div className="card-body">
               <h2 className="card-title">{company.fundOrCompany}</h2>
               <p className="text-gray-500">{company.name}</p>
-              <div className={`flex ${company.isConnected ? "gap-2" : ""}`}>
-                <button
-                  className={`btn btn-primary mt-2 ${
-                    company.isConnected ? "w-auto" : "w-full"
-                  }`}
-                  onClick={() => sendConnectionRequest(company.id)}
-                  disabled={company.isConnected}
-                >
-                  {company.isConnected ? "Connected" : "Connect"}
-                </button>
-
-                {company.isConnected && (
-                  <button className="btn btn-primary mt-2 w-auto">
-                    View details
+              <div className="flex gap-2">
+                {company.isConnected ? (
+                  <>
+                    <button className="btn btn-success">
+                      Connected
+                    </button>
+                    <button className="btn btn-outline btn-primary">
+                      View Details
+                    </button>
+                  </>
+                ) : company.isPending ? (
+                  <button className="btn btn-warning w-full">
+                    Pending Approval
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-primary w-full"
+                    onClick={() => connectCompany(company.id)}
+                    disabled={connecting}
+                  >
+                    Connect
                   </button>
                 )}
               </div>

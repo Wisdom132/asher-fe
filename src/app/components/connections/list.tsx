@@ -1,20 +1,39 @@
 "use client";
+import { useState, useMemo } from "react";
+import { useConnectionRequests } from "@/app/hooks/useConnectionRequests";
+import { useDebounce } from "use-debounce";
+import { useRespondConnectionRequest } from "@/app/hooks/useRespondConnectionRequest";
 
-import { useState } from "react";
-
-const connections = [
-  { id: 1, name: "Nvidia", handle: "@wisdom132", status: "Connected" },
-  { id: 2, name: "Vanguard", handle: "@tester1", status: "Pending" },
-  { id: 3, name: "Titi Investment", handle: "@Johss", status: "Connected" },
-  { id: 4, name: "Black rock", handle: "@Udy449", status: "Declined" },
-];
+interface ConnectionRequest {
+  id: string;
+  investor: any;
+  status: "PENDING" | "ACCEPTED" | "DECLINED";
+}
 
 export default function ConnectionsPage() {
   const [search, setSearch] = useState("");
-  const [data, setData] = useState(connections);
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-  };
+  const [debouncedSearch] = useDebounce(search, 300);
+
+  const { mutate: respondToRequest, isPending } = useRespondConnectionRequest();
+
+  const {
+    data: connectionRequests,
+    isLoading,
+    error,
+  } = useConnectionRequests();
+
+ const filteredRequests = useMemo(() => {
+   return connectionRequests?.filter((request: ConnectionRequest) =>
+     request.investor.fundOrCompany
+       .toLowerCase()
+       .includes(debouncedSearch.toLowerCase())
+   );
+ }, [connectionRequests, debouncedSearch]);
+
+  
+    if (isLoading) return <p>Loading connection requests...</p>;
+  if (error) return <p className="text-red-500">Failed to load connection requests.</p>;
+  
   return (
     <div className="p-6">
       <h1 className="text-2xl font-semibold mb-4">Connections</h1>
@@ -24,7 +43,7 @@ export default function ConnectionsPage() {
           type="text"
           placeholder="Search companies by name"
           value={search}
-          onChange={handleSearch}
+          onChange={(e) => setSearch(e.target.value)}
           className="input input-bordered w-full max-w-md mb-4"
         />
         <table className="table">
@@ -39,43 +58,59 @@ export default function ConnectionsPage() {
 
           {/* Table Body */}
           <tbody>
-            {data
-              .filter((connection) =>
-                connection.name.toLowerCase().includes(search.toLowerCase())
-              )
-              .map((connection) => (
-                <tr key={connection.id}>
-                  <td className={"font-bold text-gray-300"}>{connection.name}</td>
-                  <td className={"text-sm text-gray-300"}>
-                    {connection.handle}
-                  </td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        connection.status === "Connected"
-                          ? "badge-success"
-                          : connection.status === "Declined"
-                          ? "badge-error"
-                          : "badge-warning"
-                      }`}
-                    >
-                      {connection.status}
-                    </span>
-                  </td>
-                  <td>
-                    {connection.status === "Pending" && (
-                      <>
-                        <button className="btn btn-outline btn-error btn-sm mr-2">
-                          Reject
-                        </button>
-                        <button className="btn btn-outline btn-success btn-sm">
-                          Approve
-                        </button>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              ))}
+            {filteredRequests.map((connection: ConnectionRequest) => (
+              <tr key={connection.id}>
+                <td className={"font-bold text-gray-300"}>
+                  {connection.investor.fundOrCompany}
+                </td>
+                <td className={"text-sm text-gray-300"}>
+                  {connection.investor.name}
+                </td>
+                <td>
+                  <span
+                    className={`badge ${
+                      connection.status === "ACCEPTED"
+                        ? "badge-success"
+                        : connection.status === "DECLINED"
+                        ? "badge-error"
+                        : "badge-warning"
+                    }`}
+                  >
+                    {connection.status}
+                  </span>
+                </td>
+                <td>
+                  {connection.status === "PENDING" && (
+                    <>
+                      <button
+                        onClick={() =>
+                          respondToRequest({
+                            requestId: connection.id,
+                            accept: true,
+                          })
+                        }
+                        className="btn btn-outline btn-error btn-sm mr-2"
+                        disabled={isPending}
+                      >
+                        Reject
+                      </button>
+                      <button
+                        onClick={() =>
+                          respondToRequest({
+                            requestId: connection.id,
+                            accept: true,
+                          })
+                        }
+                        className="btn btn-outline btn-success btn-sm"
+                        disabled={isPending}
+                      >
+                        Approve
+                      </button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

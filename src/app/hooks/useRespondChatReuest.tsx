@@ -8,7 +8,7 @@ const respondChatRequest = async ({
   requestId: string;
   accept: boolean;
 }) => {
-  const response = await api.patch(`/chat/respond/${requestId}`, { accept });
+  const response = await api.patch(`/chats/approve/${requestId}`);
   return response.data;
 };
 

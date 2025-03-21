@@ -1,12 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/app/lib/axios";
 
-interface SendChatRequestPayload {
-  companyId: string;
-}
 
-const sendChatRequest = async ({ companyId }: SendChatRequestPayload) => {
-  const response = await api.post("/chat/requests", { companyId });
+
+const sendChatRequest = async (companyId: string) => {
+  const response = await api.post("/chats/request", { companyId });
   return response.data;
 };
 

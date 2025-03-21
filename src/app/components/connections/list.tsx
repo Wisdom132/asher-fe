@@ -106,7 +106,7 @@ export default function ConnectionsPage() {
                           onClick={() =>
                             respondToRequest({
                               requestId: connection.id,
-                              accept: true,
+                              accept: false,
                             })
                           }
                           className="btn btn-outline btn-error btn-sm mr-2"

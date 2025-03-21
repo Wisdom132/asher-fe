@@ -37,18 +37,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         roles: ["investor"],
       },
       {
-        href: "/dashboard/introductory-request",
-        label: "Introductory Request",
-        roles: ["company"],
-      },
-      {
         href: "/dashboard/chats",
         label: "Telegram Chats",
-        roles: ["investor", "company"],
+        roles: ["investor"],
       },
       {
         href: "/dashboard/chat-requests",
-        label: "Chat Requests",
+        label: "Telegram Chat Requests",
         roles: ["company"],
       },
       {

@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import api from "@/app/lib/axios";
+import { toast } from "react-toastify";
 
 const verifyEmail = async (otp: string) => {
   const userEmail = localStorage.getItem("user-email");
@@ -14,9 +15,11 @@ export const useVerifyEmail = () => {
   return useMutation({
     mutationFn: verifyEmail,
     onSuccess: () => {
+      toast("Account verified successfully")
       window.location.href = "/auth/login"; 
     },
     onError: (error) => {
+      toast("Error verifying account");
       console.error("Email verification failed:", error);
     },
   });

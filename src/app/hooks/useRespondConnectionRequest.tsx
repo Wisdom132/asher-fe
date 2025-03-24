@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/app/lib/axios";
+import { toast } from "react-toastify";
 
 const respondToRequest = async ({
   requestId,
@@ -20,9 +21,11 @@ export const useRespondConnectionRequest = () => {
   return useMutation({
     mutationFn: respondToRequest,
     onSuccess: (_, { requestId, accept }) => {
+      toast("Connection updated successfully")
       queryClient.invalidateQueries({ queryKey: ["connectionRequests"] });
     },
     onError: (error) => {
+      toast("Error responding to connection request");
       console.error("Failed to respond to request:", error);
     },
   });

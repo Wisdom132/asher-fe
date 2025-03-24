@@ -61,7 +61,17 @@ export default function ConnectionsPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="input input-bordered w-full max-w-md mb-4"
         />
-        <table className="table">
+        {filteredRequests?.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <img
+              src="/empty-state.svg"
+              alt="No requests"
+              className="w-48 h-48 mb-4"
+            />
+            <p className="text-gray-500 text-lg">No connections found.</p>
+          </div>
+        ) : (
+          <table className="table">
           <thead>
             <tr>
               <th>Name</th>
@@ -133,7 +143,9 @@ export default function ConnectionsPage() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table>  
+        )}
+        
       </div>
     </div>
   );

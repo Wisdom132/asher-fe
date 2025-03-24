@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/app/lib/axios";
-import { useCompanies } from "./useCompanies";
+import { toast } from "react-toastify";
 
 const connectCompanyRequest = async (companyId: string) => {
   const response = await api.post(`/connections/request`, { companyId });
@@ -15,9 +15,11 @@ export const useConnectCompany = () => {
     onSuccess: (data, companyId) => {
       // Update the cache after a successful connection
       queryClient.invalidateQueries({ queryKey: ["companies"] });
+      toast.success('Connection request Sent');
     },
     onError: (error) => {
       console.error("Failed to connect:", error);
+      toast.success("Error sending connection request");
     },
   });
 };

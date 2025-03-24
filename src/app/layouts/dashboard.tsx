@@ -1,6 +1,7 @@
-"use client"
+"use client";
 import { ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -11,48 +12,53 @@ interface User {
   fundOrCompany: string;
 }
 
-
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [user, setUser] = useState<User | null>(null);
-  
-    useEffect(() => {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
-    }, []);
+  const router = useRouter();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   if (!user) return null;
-  
-    const routes = [
-      { href: "#", label: "Home", roles: ["investor", "company"] },
-      {
-        href: "/dashboard/connections",
-        label: "Connections",
-        roles: ["investor", "company"],
-      },
-      {
-        href: "/dashboard/companies",
-        label: "Find Companies",
-        roles: ["investor"],
-      },
-      {
-        href: "/dashboard/chats",
-        label: "Telegram Chats",
-        roles: ["investor"],
-      },
-      {
-        href: "/dashboard/chat-requests",
-        label: "Telegram Chat Requests",
-        roles: ["company"],
-      },
-      {
-        href: "/dashboard/in-chat",
-        label: "In-chat",
-        roles: ["investor", "company"],
-      },
-      { href: "/auth/login", label: "Logout", roles: ["investor", "company"] },
-    ];
+
+    const handleLogout = () => {
+      localStorage.removeItem("user"); // Clear user data
+      router.push("/auth/login"); // Redirect to login
+    };
+
+  const routes = [
+    {
+      href: "/dashboard/companies",
+      label: "Find Companies",
+      roles: ["investor"],
+    },
+    {
+      href: "/dashboard/connections",
+      label: "Connections",
+      roles: ["investor", "company"],
+    },
+
+    // {
+    //   href: "/dashboard/chats",
+    //   label: "Telegram Chats",
+    //   roles: ["investor"],
+    // },
+    // {
+    //   href: "/dashboard/chat-requests",
+    //   label: "Telegram Chat Requests",
+    //   roles: ["company"],
+    // },
+    {
+      href: "/dashboard/in-chat",
+      label: "In-chat",
+      roles: ["investor", "company"],
+    },
+    // { href: "/auth/login", label: "Logout", roles: ["investor", "company"] },
+  ];
 
   return (
     <div className="flex min-h-screen">
@@ -77,6 +83,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               ))}
           </ul>
         </nav>
+        <button
+          onClick={handleLogout}
+          className="mt-auto bg-red-600 hover:bg-red-700 text-white p-3 rounded-lg w-full"
+        >
+          Logout
+        </button>
       </aside>
 
       {/* Main content */}

@@ -5,16 +5,13 @@ import { useConnections } from "@/app/hooks/useConnections";
 
 export default function ChatComponent() {
   const { data: connections, isLoading } = useConnections();
-
-  const [selectedInvestor, setSelectedInvestor] = useState<{
+  const [selectedConnection, setSelectedConnection] = useState<{
     id: number;
     name: string;
+    connectionId: string;
   } | null>(null);
   const [input, setInput] = useState("");
-
-  const [messages, setMessages] = useState<
-    { sender: string; text: string; time: string }[]
-  >([]);
+  const [messages, setMessages] = useState<any[]>([]);
   const [socket, setSocket] = useState<Socket | null>(null);
 
   const storedUser =
@@ -28,11 +25,15 @@ export default function ChatComponent() {
     const newSocket = io("http://localhost:3000", {
       query: { userId: parsedUser.id, userType },
     });
-
     setSocket(newSocket);
 
     newSocket.on("receiveMessage", (message) => {
+      console.log("mess", message);
       setMessages((prev) => [...prev, message]);
+
+      if (message.senderId !== parsedUser.id) {
+        beepSound.play();
+      }
     });
 
     return () => {
@@ -41,143 +42,127 @@ export default function ChatComponent() {
   }, [parsedUser?.id, parsedUser?.userType]);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !selectedConnection) return;
 
-    const handleNewRequest = (request: any) => {
-      console.log("New introduction request received:", request);
-      alert(`New introduction request from ${request.companyId}`);
-    };
+    console.log("Fetching messages for:", selectedConnection.connectionId);
 
-    const handleRequestUpdate = (updatedRequest: any) => {
-      console.log("Introduction request updated:", updatedRequest);
-      alert(
-        `Introduction request ${
-          updatedRequest.status === "accepted" ? "accepted" : "declined"
-        }`
-      );
-    };
+    socket.emit("fetchMessages", {
+      connectionId: selectedConnection.connectionId,
+    });
 
-    socket.on("newIntroductionRequest", handleNewRequest);
-    socket.on("introductionRequestUpdated", handleRequestUpdate);
+    socket.on("messagesHistory", (chatHistory) => {
+      console.log("Chat history received:", chatHistory);
+
+      setMessages(chatHistory);
+    });
 
     return () => {
-      socket.off("newIntroductionRequest", handleNewRequest);
-      socket.off("introductionRequestUpdated", handleRequestUpdate);
+      socket.off("messagesHistory");
+      socket.off("typing");
+      socket.off("stopTyping");
     };
-  }, [socket]);
+  }, [socket, selectedConnection]);
 
-  const handleSendMessage = () => {
-    if (!input.trim() || !selectedInvestor || !socket) return;
+  const beepSound = new Audio("/beep.mp3");
 
+  const handleSendMessage = async () => {
+    if (!input.trim() || !selectedConnection || !socket) return;
+
+    console.log("selectedConnection", selectedConnection);
     const message = {
-      sender: parsedUser.id,
-      recipientId: selectedInvestor.id,
-      text: input,
-      time: new Date().toLocaleTimeString(),
+      connectionId: selectedConnection.connectionId, // Ensure correct connectionId
+      senderId: parsedUser.id,
+      recipientId: selectedConnection.id,
+      message: input,
+      timestamp: new Date().toISOString(),
     };
 
     socket.emit("sendMessage", message);
-    setMessages((prev) => [...prev, message]);
+    setMessages((prev) => [
+      ...prev,
+      { ...message, time: new Date().toLocaleTimeString() },
+    ]);
     setInput("");
-  };
-
-  const handleSendIntroductionRequest = () => {
-    if (!selectedInvestor || !socket) return;
-
-      console.log("Sending introduction request:", {
-        companyId: parsedUser.id,
-        investorId: selectedInvestor.id,
-      });
-
-
-
-    socket.emit("sendIntroductionRequest", {
-      companyId: parsedUser.id, // Use actual company ID
-      investorId: selectedInvestor.id,
-    });
-
-    alert(`Introduction request sent to ${selectedInvestor.name}`);
   };
 
   if (isLoading) return <p>Loading connections...</p>;
 
   return (
     <div className="flex h-[90vh]">
-      {/* Sidebar */}
       <div className="w-1/4 shadow-lg p-4 border rounded border-gray-800">
         <h2 className="text-lg font-bold mb-4">Connected Investors</h2>
         <ul>
           {connections.map((connection: any) => {
-            const investor =
+            const participant =
               userType === "Company" ? connection.investor : connection.company;
-
             return (
               <li
-                key={investor.id}
+                key={connection.connectionId} // Ensure unique key for each connection
                 className={`p-3 rounded-lg cursor-pointer ${
-                  selectedInvestor?.id === investor.id
+                  selectedConnection?.connectionId === connection.connectionId
                     ? "bg-gray-500 text-white"
                     : "hover:bg-gray-900"
                 }`}
-                onClick={() => setSelectedInvestor(investor)}
+                onClick={() =>
+                  setSelectedConnection({
+                    id: participant.id,
+                    name: participant.name,
+                    connectionId: connection.id, // Set connectionId
+                  })
+                }
               >
-                {investor.name}
+                {participant.name}
               </li>
             );
           })}
         </ul>
       </div>
 
-      {/* Chat Section */}
       <div className="flex flex-col w-3/4 border border-gray-800 rounded shadow-lg">
-        {selectedInvestor ? (
+        {selectedConnection ? (
           <>
-            {/* Chat Header */}
             <div className="p-4 border-b border-b-gray-800 bg-gray-500 text-white font-bold text-lg flex justify-between">
-              <span>Chat with {selectedInvestor.name}</span>
-              <button
-                className="bg-blue-500 text-white px-4 py-1 rounded"
-                onClick={handleSendIntroductionRequest}
-              >
-                Request Introduction
-              </button>
+              <span>Chat with {selectedConnection.name}</span>
             </div>
 
-            {/* Scrollable Messages */}
             <div className="flex-1 p-4 overflow-y-auto space-y-4 h-0">
               {messages.map((msg, index) => (
                 <div
                   key={index}
                   className={`flex ${
-                    msg.sender === parsedUser.id
+                    msg.senderId === parsedUser.id
                       ? "justify-end"
                       : "justify-start"
                   }`}
                 >
                   <div
                     className={`p-3 rounded-lg max-w-xs ${
-                      msg.sender === parsedUser.id
+                      msg.senderId === parsedUser.id
                         ? "bg-primary text-white"
                         : "bg-gray-200 text-black"
                     }`}
                   >
-                    <p className="text-sm">{msg.text}</p>
+                    <p className="text-sm">{msg.message}</p>
                     <span className="block text-xs mt-1 text-gray-500">
-                      {msg.time}
+                      <span className="block text-xs mt-1 text-gray-500">
+                        {new Date(msg.timestamp).toLocaleTimeString()}{" "}
+                        {/* Format timestamp */}
+                      </span>
                     </span>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Fixed Input Field */}
             <div className="p-4 border-t border-t-gray-800 flex items-center">
               <input
                 type="text"
                 placeholder="Type a message..."
                 value={input}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                }}
                 onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                onChange={(e) => setInput(e.target.value)}
                 className="flex-1 p-2 border rounded-lg focus:outline-none"
               />
               <button
@@ -197,4 +182,3 @@ export default function ChatComponent() {
     </div>
   );
 }
-

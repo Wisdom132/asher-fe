@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import api from "@/app/lib/axios";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const registerUser = async (data: {
   name: string;
@@ -19,10 +20,12 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
+      toast("Account created, please verify account")
      router.push("/auth/verify-email");
     },
     onError: (error) => {
       console.error("Registration failed:", error);
+      toast("Error creating account");
     },
   });
 };

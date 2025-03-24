@@ -16,6 +16,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
+    useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+      }
+    }, []);
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {

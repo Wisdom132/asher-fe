@@ -78,10 +78,10 @@ export default function ChatComponent() {
     };
 
     socket.emit("sendMessage", message);
-    setMessages((prev) => [
-      ...prev,
-      { ...message, time: new Date().toLocaleTimeString() },
-    ]);
+    // setMessages((prev) => [
+    //   ...prev,
+    //   { ...message, time: new Date().toLocaleTimeString() },
+    // ]);
     setInput("");
   };
 

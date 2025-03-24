@@ -1,10 +1,12 @@
 "use client";
 import { useState } from "react";
 import { useLogin } from "@/app/hooks/useLogin";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
    const [form, setForm] = useState({ email: "", password: "" });
   const [rememberMe, setRememberMe] = useState(false);
+  const router = useRouter()
 
   const {mutate, isPending} = useLogin()
 
@@ -54,17 +56,19 @@ const Login = () => {
               checked={rememberMe}
               onChange={() => setRememberMe(!rememberMe)}
             />
-            <label>Remember Me</label>
+            <div className="text-sm text-left mt-3 text-blue-500 cursor-pointer hover:underline">
+              Forgot Password?
+            </div>
           </div>
           <button
             type="submit"
             className="btn btn-primary w-full mt-4"
             disabled={isPending}
           >
-            {isPending ? 'Logging in' : 'Login'}
+            {isPending ? "Logging in" : "Login"}
           </button>
           <div className="text-sm text-center mt-3 text-blue-500 cursor-pointer hover:underline">
-            Forgot Password?
+            Don't have an account? Register
           </div>
         </form>
       </div>

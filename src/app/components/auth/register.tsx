@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRegister } from "@/app/hooks/useRegister";
 import { useValidateTelegramHandle } from "@/app/hooks/useValidateTelegramHandle";
+import Link from "next/link";
 
 const RegistrationPage = () => {
   const { isPending, mutate, isSuccess } = useRegister();
@@ -152,6 +153,13 @@ const RegistrationPage = () => {
           >
             {isPending ? "Creating Account" : "Create Account"}
           </button>
+
+          <Link
+            href="/auth/login"
+            className="text-sm flex justify-center mt-3 text-blue-500 cursor-pointer hover:underline"
+          >
+            Already have an account? Login
+          </Link>
         </form>
       </div>
     </div>

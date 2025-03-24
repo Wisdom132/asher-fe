@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useLogin } from "@/app/hooks/useLogin";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const Login = () => {
    const [form, setForm] = useState({ email: "", password: "" });
@@ -49,17 +50,7 @@ const Login = () => {
               required
             />
           </div>
-          <div className="form-control mt-3 text-sm flex items-center">
-            <input
-              type="checkbox"
-              className="checkbox mr-1 scale-75"
-              checked={rememberMe}
-              onChange={() => setRememberMe(!rememberMe)}
-            />
-            <div className="text-sm text-left mt-3 text-blue-500 cursor-pointer hover:underline">
-              Forgot Password?
-            </div>
-          </div>
+           
           <button
             type="submit"
             className="btn btn-primary w-full mt-4"
@@ -67,9 +58,9 @@ const Login = () => {
           >
             {isPending ? "Logging in" : "Login"}
           </button>
-          <div className="text-sm text-center mt-3 text-blue-500 cursor-pointer hover:underline">
+          <Link href="/auth/register" className="text-sm flex justify-center mt-3 text-blue-500 cursor-pointer hover:underline">
             Don't have an account? Register
-          </div>
+          </Link>
         </form>
       </div>
     </div>

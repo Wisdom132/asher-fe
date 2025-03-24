@@ -22,9 +22,9 @@ export default function Home() {
         <p className="mt-4 text-lg text-gray-600">
           Secure, real-time messaging to build valuable connections.
         </p>
-        <a href="/register" className="btn btn-primary mt-6">
+        <Link href="/auth/register" className="btn btn-primary mt-6">
           Get Started
-        </a>
+        </Link>
       </main>
 
       <section className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 w-3/4">

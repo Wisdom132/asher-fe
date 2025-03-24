@@ -4,12 +4,12 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-base-200">
       <header className="navbar bg-base-100 shadow-lg w-full p-4 flex justify-between">
-        <h1 className="text-2xl font-bold">Investor Connect</h1>
+        <h1 className="text-2xl font-bold">Asher Connect</h1>
         <div>
           <Link href="/auth/login" className="btn btn-primary">
             Login
           </Link>
-          <Link href="/auth/register" className="btn btn-secondary ml-2">
+          <Link href="/auth/register" className="btn btn-info ml-2">
             Sign Up
           </Link>
         </div>

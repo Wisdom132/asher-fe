@@ -22,7 +22,7 @@ export default function ChatComponent() {
   useEffect(() => {
     if (!parsedUser?.id || !parsedUser?.userType) return;
 
-    const newSocket = io("http://localhost:3000", {
+    const newSocket = io("https://asher-backend-cc008cd2ac25.herokuapp.com", {
       query: { userId: parsedUser.id, userType },
     });
     setSocket(newSocket);
@@ -98,11 +98,10 @@ export default function ChatComponent() {
             return (
               <li
                 key={connection.connectionId} // Ensure unique key for each connection
-                className={`p-3 rounded-lg cursor-pointer ${
-                  selectedConnection?.connectionId === connection.connectionId
+                className={`p-3 rounded-lg cursor-pointer ${selectedConnection?.connectionId === connection.connectionId
                     ? "bg-gray-500 text-white"
                     : "hover:bg-gray-900"
-                }`}
+                  }`}
                 onClick={() =>
                   setSelectedConnection({
                     id: participant.id,
@@ -129,18 +128,16 @@ export default function ChatComponent() {
               {messages.map((msg, index) => (
                 <div
                   key={index}
-                  className={`flex ${
-                    msg.senderId === parsedUser.id
+                  className={`flex ${msg.senderId === parsedUser.id
                       ? "justify-end"
                       : "justify-start"
-                  }`}
+                    }`}
                 >
                   <div
-                    className={`p-3 rounded-lg max-w-xs ${
-                      msg.senderId === parsedUser.id
+                    className={`p-3 rounded-lg max-w-xs ${msg.senderId === parsedUser.id
                         ? "bg-primary text-white"
                         : "bg-gray-200 text-black"
-                    }`}
+                      }`}
                   >
                     <p className="text-sm">{msg.message}</p>
                     <span className="block text-xs mt-1 text-gray-500">
